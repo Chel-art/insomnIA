@@ -1,22 +1,20 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import authRouter from './routes/auth.js';
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+const allowedOrigin = /^http:\/\/localhost(:\d+)?$/;
+app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
-// --- Rutas (se añadirán en fases posteriores) ---
-// import authRouter from './routes/auth.js';
-// import chatRouter from './routes/chat.js';
-// app.use('/api/auth', authRouter);
-// app.use('/api/chat', chatRouter);
+app.use('/api/auth', authRouter);
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: '🌙 InsomnIA API online' });
 });
 
