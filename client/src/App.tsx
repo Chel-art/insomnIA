@@ -7,6 +7,7 @@
  * No contiene lógica de negocio ni acceso a datos.
  */
 import { DottedSurface } from '@/components/ui/DottedSurface';
+import logoSrc from '@/assets/logo.png';
 
 function App() {
   return (
@@ -27,24 +28,19 @@ function App() {
 
       {/* Contenido de landing */}
       <div className="glass-card" style={{ maxWidth: '520px', padding: '3rem 2.5rem' }}>
-        {/* Icono luna */}
-        <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }} aria-hidden="true">
-          🌙
-        </div>
-
-        {/* Título con fuente display */}
-        <h1
+        {/* Logo de marca — sustituye al icono emoji y al título de texto */}
+        <img
+          src={logoSrc}
+          alt="InsomnIA — El mundo de los sueños"
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            fontWeight: 700,
-            marginBottom: '0.5rem',
-            lineHeight: 1.1,
+            width: '100%',
+            maxWidth: '380px',
+            height: 'auto',
+            marginBottom: '1.75rem',
+            display: 'block',
+            marginInline: 'auto',
           }}
-        >
-          Insom
-          <span className="text-gold-shimmer">IA</span>
-        </h1>
+        />
 
         {/* Subtítulo con nombre Morfeo */}
         <p
