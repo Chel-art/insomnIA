@@ -1,0 +1,38 @@
+# Entorno
+.env
+.env.local
+.env.*.local
+
+# Dependencias
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Base de datos
+*.db
+*.sqlite
+server/prisma/migrations/
+
+# Build
+client/dist/
+client/.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Prisma
+server/prisma/dev.db
+server/prisma/dev.db-journal
