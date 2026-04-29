@@ -1,4 +1,5 @@
-import { useState, useRef, type KeyboardEvent } from 'react';
+import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
+import { useVoiceDictation } from '../../hooks/useVoiceDictation';
 
 interface ChatInputProps {
   onSubmit: (content: string) => void;
@@ -8,6 +9,17 @@ interface ChatInputProps {
 export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleVoiceResult = useCallback((text: string) => {
+    setValue((prev) => {
+      const spacer = prev && !prev.endsWith(' ') ? ' ' : '';
+      return prev + spacer + text;
+    });
+  }, []);
+
+  const { isListening, isSupported, toggleListening } = useVoiceDictation({
+    onResult: handleVoiceResult,
+  });
 
   const handleSubmit = () => {
     const trimmed = value.trim();
@@ -45,7 +57,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder="Describe tu sueño a Morfeo... (Enter para enviar)"
+        placeholder={isListening ? "Escuchando..." : "Describe tu sueño a Morfeo... (Enter para enviar)"}
         disabled={isLoading}
         rows={1}
         style={{
@@ -54,7 +66,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
           padding: '0.75rem 1rem',
           borderRadius: '1rem',
           background: 'rgba(255,255,255,0.05)',
-          border: '1px solid rgba(255,255,255,0.12)',
+          border: isListening ? '1px solid var(--color-accent-purple)' : '1px solid rgba(255,255,255,0.12)',
           color: 'var(--color-text-primary)',
           fontSize: '0.9375rem',
           lineHeight: 1.5,
@@ -65,9 +77,39 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
           maxHeight: '160px',
           overflowY: 'auto',
         }}
-        onFocus={(e) => (e.target.style.borderColor = 'var(--color-accent-purple)')}
-        onBlur={(e) => (e.target.style.borderColor = 'rgba(255,255,255,0.12)')}
+        onFocus={(e) => (!isListening && (e.target.style.borderColor = 'var(--color-accent-purple)'))}
+        onBlur={(e) => (!isListening && (e.target.style.borderColor = 'rgba(255,255,255,0.12)'))}
       />
+      
+      {isSupported && (
+        <button
+          type="button"
+          onClick={toggleListening}
+          disabled={isLoading}
+          title="Dictar por voz"
+          style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '50%',
+            background: isListening ? 'rgba(220, 50, 50, 0.2)' : 'rgba(255,255,255,0.08)',
+            border: isListening ? '1px solid rgba(220, 50, 50, 0.5)' : 'none',
+            cursor: isLoading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s',
+            flexShrink: 0,
+            color: isListening ? '#f87171' : 'var(--color-text-secondary)',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="22" />
+          </svg>
+        </button>
+      )}
+
       <button
         type="button"
         onClick={handleSubmit}
