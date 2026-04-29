@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  createdAt    DateTime  @default(now())
+
+  sessions     Session[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String   @default("Nueva sesión")
+  createdAt DateTime @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  summary   DreamSummary?
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  sessionId Int
+  role      String   // "user" | "assistant"
+  content   String
+  createdAt DateTime @default(now())
+
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model DreamSummary {
+  id        Int      @id @default(autoincrement())
+  sessionId Int      @unique
+  symbols   String   // JSON string array
+  emotions  String   // JSON string array
+  themes    String   // JSON string array
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
