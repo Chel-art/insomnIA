@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
-import { useVoiceDictation } from '../../hooks/useVoiceDictation';
+import { useVoiceDictation } from '@/hooks/useVoiceDictation';
 
 interface ChatInputProps {
   onSubmit: (content: string) => void;
