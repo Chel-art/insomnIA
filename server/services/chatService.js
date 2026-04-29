@@ -32,18 +32,17 @@ export async function processUserMessage(sessionId, userContent, userId) {
 
   const assistantContent = await callMorfeo(conversationHistory);
 
-  await createMessage(sessionId, 'user', userContent);
-  await createMessage(sessionId, 'assistant', assistantContent);
-
-  // Generar y actualizar el título si es una sesión nueva
+  // Generar y actualizar el título si es una sesión nueva (síncrono para devolverlo en la respuesta)
+  let newTitle = null;
   if (session && session.title === 'Nueva sesión') {
-    generateSessionTitle(userContent)
-      .then((newTitle) => {
-        if (newTitle) {
-          return updateSessionTitle(sessionId, newTitle);
-        }
-      })
-      .catch((err) => console.error('Error al actualizar título:', err));
+    try {
+      newTitle = await generateSessionTitle(userContent);
+      if (newTitle) {
+        await updateSessionTitle(sessionId, newTitle);
+      }
+    } catch (err) {
+      console.error('Error al actualizar título:', err);
+    }
   }
 
   // Generar y actualizar el resumen de forma asíncrona para no bloquear la respuesta
@@ -61,5 +60,5 @@ export async function processUserMessage(sessionId, userContent, userId) {
     })
     .catch((err) => console.error('Error al guardar resumen del sueño:', err));
 
-  return assistantContent;
+  return { reply: assistantContent, title: newTitle };
 }

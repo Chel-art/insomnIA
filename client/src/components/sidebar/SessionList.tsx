@@ -8,6 +8,7 @@ interface SessionListProps {
   userEmail: string | undefined;
   onLogout: () => void;
   onShowHistory: () => void;
+  onRename: (sessionId: number, title: string) => void;
 }
 
 export function SessionList({
@@ -18,7 +19,16 @@ export function SessionList({
   userEmail,
   onLogout,
   onShowHistory,
+  onRename,
 }: SessionListProps) {
+  const handleRename = (e: React.MouseEvent, session: Session) => {
+    e.stopPropagation();
+    const newTitle = prompt('Nuevo título para la sesión:', session.title);
+    if (newTitle && newTitle.trim() && newTitle !== session.title) {
+      onRename(session.id, newTitle.trim());
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.25rem', gap: '1rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -72,28 +82,61 @@ export function SessionList({
         {sessions.map((session) => {
           const isActive = activeSession?.id === session.id;
           return (
-            <button
+            <div
               key={session.id}
-              type="button"
-              onClick={() => onSelect(session)}
               style={{
-                textAlign: 'left',
-                padding: '0.5rem 0.75rem',
-                borderRadius: '0.625rem',
-                background: isActive ? 'rgba(124,106,247,0.2)' : 'transparent',
-                border: isActive ? '1px solid rgba(124,106,247,0.35)' : '1px solid transparent',
-                color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                fontSize: '0.8125rem',
-                cursor: 'pointer',
-                width: '100%',
-                transition: 'all 0.15s',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                padding: '0.25rem 0',
               }}
             >
-              {session.title}
-            </button>
+              <button
+                type="button"
+                onClick={() => onSelect(session)}
+                style={{
+                  textAlign: 'left',
+                  padding: '0.5rem 0.75rem',
+                  borderRadius: '0.625rem',
+                  background: isActive ? 'rgba(124,106,247,0.2)' : 'transparent',
+                  border: isActive ? '1px solid rgba(124,106,247,0.35)' : '1px solid transparent',
+                  color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                  fontSize: '0.8125rem',
+                  cursor: 'pointer',
+                  flex: 1,
+                  transition: 'all 0.15s',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {session.title}
+              </button>
+              {isActive && (
+                <button
+                  type="button"
+                  onClick={(e) => handleRename(e, session)}
+                  title="Renombrar"
+                  style={{
+                    padding: '0.5rem',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'rgba(255,255,255,0.3)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-accent-purple)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                  </svg>
+                </button>
+              )}
+            </div>
           );
         })}
       </div>
