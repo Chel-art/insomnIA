@@ -84,3 +84,22 @@ export async function extractDreamSummary(conversationHistory) {
   }
 }
 
+export async function generateSessionTitle(dreamContent) {
+  try {
+    const response = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      messages: [
+        { role: 'system', content: 'Eres un poeta conciso. Genera un título evocador y corto (máximo 4 palabras) para el siguiente sueño. No uses comillas en la respuesta.' },
+        { role: 'user', content: dreamContent }
+      ],
+      temperature: 0.7,
+      max_tokens: 15,
+    });
+    
+    return response.choices[0].message.content.replace(/["']/g, '').trim();
+  } catch (err) {
+    console.error('Error al generar el título:', err);
+    return 'Sueño fragmentado';
+  }
+}
+
