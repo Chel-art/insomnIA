@@ -1,0 +1,93 @@
+import { useState, useEffect, useCallback } from 'react';
+import type { Session, Message } from '../types/chat';
+import {
+  createSession,
+  getSessions,
+  getSessionMessages,
+  sendMessage,
+} from '../services/chatApi';
+
+export function useChat() {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [activeSession, setActiveSession] = useState<Session | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    getSessions()
+      .then((data) => {
+        setSessions(data);
+        if (data.length > 0) loadSession(data[0]);
+      })
+      .catch(() => setError('No se pudieron cargar las sesiones'));
+  }, []);
+
+  const loadSession = useCallback(async (session: Session) => {
+    setActiveSession(session);
+    setMessages([]);
+    try {
+      const msgs = await getSessionMessages(session.id);
+      setMessages(msgs);
+    } catch {
+      setError('No se pudieron cargar los mensajes');
+    }
+  }, []);
+
+  const startNewSession = useCallback(async () => {
+    try {
+      const session = await createSession();
+      setSessions((prev) => [session, ...prev]);
+      setActiveSession(session);
+      setMessages([]);
+    } catch {
+      setError('No se pudo crear la sesión');
+    }
+  }, []);
+
+  const submitMessage = useCallback(
+    async (content: string) => {
+      if (!activeSession || isLoading) return;
+
+      const optimisticUser: Message = {
+        id: Date.now(),
+        sessionId: activeSession.id,
+        role: 'user',
+        content,
+        createdAt: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, optimisticUser]);
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const reply = await sendMessage(activeSession.id, content);
+        const assistantMsg: Message = {
+          id: Date.now() + 1,
+          sessionId: activeSession.id,
+          role: 'assistant',
+          content: reply,
+          createdAt: new Date().toISOString(),
+        };
+        setMessages((prev) => [...prev, assistantMsg]);
+      } catch {
+        setMessages((prev) => prev.filter((m) => m.id !== optimisticUser.id));
+        setError('Morfeo no pudo responder. Inténtalo de nuevo.');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [activeSession, isLoading],
+  );
+
+  return {
+    sessions,
+    activeSession,
+    messages,
+    isLoading,
+    error,
+    loadSession,
+    startNewSession,
+    submitMessage,
+  };
+}

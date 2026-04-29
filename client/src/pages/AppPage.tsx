@@ -1,70 +1,94 @@
 import { AppLayout } from '@/components/layout/AppLayout';
+import { SessionList } from '@/components/sidebar/SessionList';
+import { ChatWindow } from '@/components/chat/ChatWindow';
+import { ChatInput } from '@/components/chat/ChatInput';
 import { useAuth } from '@/hooks/useAuth';
-
-function SidebarPlaceholder() {
-  const { user, logout } = useAuth();
-
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        padding: '1.25rem',
-        gap: '1rem',
-      }}
-    >
-      <p
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.1rem',
-          color: 'var(--color-accent-purple)',
-          fontStyle: 'italic',
-        }}
-      >
-        Morfeo
-      </p>
-      <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', marginTop: 'auto' }}>
-        {user?.email}
-      </p>
-      <button className="btn-ghost" type="button" onClick={logout} style={{ fontSize: '0.875rem' }}>
-        Cerrar sesión
-      </button>
-    </div>
-  );
-}
-
-function ChatPlaceholder() {
-  return (
-    <div
-      className="glass-card"
-      style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: '1rem',
-        height: '100%',
-      }}
-    >
-      <p
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: '1.25rem',
-          color: 'var(--color-text-secondary)',
-          fontStyle: 'italic',
-        }}
-      >
-        El chat con Morfeo llegará en la siguiente fase...
-      </p>
-    </div>
-  );
-}
+import { useChat } from '@/hooks/useChat';
 
 export function AppPage() {
+  const { user, logout } = useAuth();
+  const {
+    sessions,
+    activeSession,
+    messages,
+    isLoading,
+    error,
+    loadSession,
+    startNewSession,
+    submitMessage,
+  } = useChat();
+
   return (
-    <AppLayout sidebar={<SidebarPlaceholder />}>
-      <ChatPlaceholder />
+    <AppLayout
+      sidebar={
+        <SessionList
+          sessions={sessions}
+          activeSession={activeSession}
+          onSelect={loadSession}
+          onNew={startNewSession}
+          userEmail={user?.email}
+          onLogout={logout}
+        />
+      }
+    >
+      <div
+        className="glass-card"
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: '1rem',
+          height: '100%',
+          overflow: 'hidden',
+        }}
+      >
+        {error && (
+          <div
+            style={{
+              padding: '0.5rem 1.25rem',
+              background: 'rgba(220,50,50,0.15)',
+              borderBottom: '1px solid rgba(220,50,50,0.2)',
+              fontSize: '0.8125rem',
+              color: '#f87171',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {!activeSession ? (
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: '1rem',
+              opacity: 0.5,
+            }}
+          >
+            <p
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.5rem',
+                color: 'var(--color-accent-purple)',
+                fontStyle: 'italic',
+              }}
+            >
+              Inicia una sesión
+            </p>
+            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
+              Pulsa + en el sidebar para comenzar
+            </p>
+          </div>
+        ) : (
+          <>
+            <ChatWindow messages={messages} isLoading={isLoading} />
+            <ChatInput onSubmit={submitMessage} isLoading={isLoading} />
+          </>
+        )}
+      </div>
     </AppLayout>
   );
 }

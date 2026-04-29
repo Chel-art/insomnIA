@@ -182,6 +182,12 @@ h1, h2, h3, h4, h5, h6 {
   50% { opacity: 1; }
 }
 
+/* Puntos animados de "Morfeo está escribiendo" */
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
 .animate-morpheo-pulse {
   animation: morpheoPulse 1.4s ease-in-out infinite;
 }

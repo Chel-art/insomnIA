@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRouter from './routes/auth.js';
+import chatRouter from './routes/chat.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors({ origin: allowedOrigin }));
 app.use(express.json());
 
 app.use('/api/auth', authRouter);
+app.use('/api', chatRouter);
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', message: '🌙 InsomnIA API online' });

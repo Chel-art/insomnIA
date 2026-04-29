@@ -24,6 +24,7 @@ model Session {
 
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Message[]
+  summary   DreamSummary?
 }
 
 model Message {
@@ -34,4 +35,16 @@ model Message {
   createdAt DateTime @default(now())
 
   session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+}
+
+model DreamSummary {
+  id        Int      @id @default(autoincrement())
+  sessionId Int      @unique
+  symbols   String   // JSON string array
+  emotions  String   // JSON string array
+  themes    String   // JSON string array
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
