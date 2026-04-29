@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { toast } from 'sonner';
 import type { Session, Message } from '../types/chat';
 import {
   createSession,
@@ -20,7 +21,10 @@ export function useChat() {
         setSessions(data);
         if (data.length > 0) loadSession(data[0]);
       })
-      .catch(() => setError('No se pudieron cargar las sesiones'));
+      .catch(() => {
+        setError('No se pudieron cargar las sesiones');
+        toast.error('Error de conexión', { description: 'No pudimos cargar tus sesiones pasadas.' });
+      });
   }, []);
 
   const loadSession = useCallback(async (session: Session) => {
@@ -30,7 +34,7 @@ export function useChat() {
       const msgs = await getSessionMessages(session.id);
       setMessages(msgs);
     } catch {
-      setError('No se pudieron cargar los mensajes');
+      toast.error('No se pudieron cargar los mensajes', { description: 'Revisa tu conexión a internet.' });
     }
   }, []);
 
@@ -40,8 +44,9 @@ export function useChat() {
       setSessions((prev) => [session, ...prev]);
       setActiveSession(session);
       setMessages([]);
+      toast.success('Nueva sesión creada', { description: 'Morfeo está listo para escucharte.' });
     } catch {
-      setError('No se pudo crear la sesión');
+      toast.error('No se pudo crear la sesión', { description: 'El servidor podría estar ocupado.' });
     }
   }, []);
 
@@ -73,6 +78,7 @@ export function useChat() {
       } catch {
         setMessages((prev) => prev.filter((m) => m.id !== optimisticUser.id));
         setError('Morfeo no pudo responder. Inténtalo de nuevo.');
+        toast.error('Fallo en la conexión onírica', { description: 'No pudimos contactar a Morfeo. Por favor, reintenta.' });
       } finally {
         setIsLoading(false);
       }

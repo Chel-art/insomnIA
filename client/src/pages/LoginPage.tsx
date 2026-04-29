@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { DottedSurface } from '@/components/ui/DottedSurface';
 import { useAuth } from '@/hooks/useAuth';
 import type { AxiosError } from 'axios';
@@ -20,10 +21,13 @@ export function LoginPage() {
 
     try {
       await login({ email, password });
+      toast.success('Bienvenido a InsomnIA', { description: 'Has iniciado sesión correctamente.' });
       navigate('/app');
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
-      setError(axiosError.response?.data?.error ?? 'Error al iniciar sesión');
+      const errorMsg = axiosError.response?.data?.error ?? 'Error al iniciar sesión';
+      setError(errorMsg);
+      toast.error('Acceso denegado', { description: errorMsg });
     } finally {
       setIsLoading(false);
     }

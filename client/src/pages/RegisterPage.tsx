@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { DottedSurface } from '@/components/ui/DottedSurface';
 import { useAuth } from '@/hooks/useAuth';
 import type { AxiosError } from 'axios';
@@ -20,11 +21,13 @@ export function RegisterPage() {
 
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden');
+      toast.error('Error de validación', { description: 'Las contraseñas no coinciden.' });
       return;
     }
 
     if (password.length < 8) {
       setError('La contraseña debe tener al menos 8 caracteres');
+      toast.error('Contraseña insegura', { description: 'La contraseña debe tener al menos 8 caracteres.' });
       return;
     }
 
@@ -32,10 +35,13 @@ export function RegisterPage() {
 
     try {
       await register({ email, password });
+      toast.success('Cuenta creada', { description: 'Bienvenido a InsomnIA. Morfeo te espera.' });
       navigate('/app');
     } catch (err) {
       const axiosError = err as AxiosError<{ error: string }>;
-      setError(axiosError.response?.data?.error ?? 'Error al crear la cuenta');
+      const errorMsg = axiosError.response?.data?.error ?? 'Error al crear la cuenta';
+      setError(errorMsg);
+      toast.error('No se pudo crear la cuenta', { description: errorMsg });
     } finally {
       setIsLoading(false);
     }

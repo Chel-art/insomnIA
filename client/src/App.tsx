@@ -6,6 +6,7 @@
  * No contiene lógica de negocio ni acceso a datos.
  */
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { LoginPage } from '@/pages/LoginPage';
@@ -32,6 +33,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </AuthProvider>
+      <Toaster theme="dark" position="top-center" richColors />
     </BrowserRouter>
   );
 }
