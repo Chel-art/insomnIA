@@ -18,6 +18,7 @@ export function AppPage() {
     loadSession,
     startNewSession,
     submitMessage,
+    renameSession,
   } = useChat();
 
   const [view, setView] = useState<'chat' | 'history'>('chat');
@@ -43,6 +44,7 @@ export function AppPage() {
           userEmail={user?.email}
           onLogout={logout}
           onShowHistory={() => setView('history')}
+          onRename={renameSession}
         />
       }
     >

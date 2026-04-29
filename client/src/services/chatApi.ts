@@ -29,7 +29,12 @@ export async function getSessionMessages(sessionId: number): Promise<Message[]> 
   return data;
 }
 
-export async function sendMessage(sessionId: number, content: string): Promise<string> {
-  const { data } = await api.post<{ reply: string }>('/chat', { sessionId, content });
-  return data.reply;
+export async function sendMessage(sessionId: number, content: string): Promise<{ reply: string; title?: string }> {
+  const { data } = await api.post<{ reply: string; title?: string }>('/chat', { sessionId, content });
+  return data;
+}
+
+export async function updateSessionTitle(sessionId: number, title: string): Promise<Session> {
+  const { data } = await api.patch<Session>(`/sessions/${sessionId}`, { title });
+  return data;
 }

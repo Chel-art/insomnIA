@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { createSession, getUserSessions, getSessionById } from '../dao/sessionDao.js';
+import { createSession, getUserSessions, getSessionById, updateSessionTitle } from '../dao/sessionDao.js';
 import { getSessionMessages } from '../dao/messageDao.js';
 import { getUserDreamSummaries } from '../dao/dreamSummaryDao.js';
 import { processUserMessage } from '../services/chatService.js';
@@ -37,6 +37,25 @@ router.get('/sessions', async (req, res) => {
   }
 });
 
+router.patch('/sessions/:id', async (req, res) => {
+  const sessionId = parseInt(req.params.id);
+  const { title } = req.body;
+
+  if (!title?.trim()) {
+    return res.status(400).json({ error: 'El título es requerido' });
+  }
+
+  const session = await getSessionById(sessionId, req.userId);
+  if (!session) return res.status(404).json({ error: 'Sesión no encontrada' });
+
+  try {
+    const updated = await updateSessionTitle(sessionId, title.trim());
+    res.json(updated);
+  } catch {
+    res.status(500).json({ error: 'Error al actualizar el título' });
+  }
+});
+
 router.get('/sessions/:id/messages', async (req, res) => {
   const sessionId = parseInt(req.params.id);
 
@@ -62,8 +81,8 @@ router.post('/chat', async (req, res) => {
   if (!session) return res.status(404).json({ error: 'Sesión no encontrada' });
 
   try {
-    const reply = await processUserMessage(parseInt(sessionId), content.trim(), req.userId);
-    res.json({ reply });
+    const { reply, title } = await processUserMessage(parseInt(sessionId), content.trim(), req.userId);
+    res.json({ reply, title });
   } catch (err) {
     console.error('Error en /api/chat:', err);
     res.status(500).json({ error: 'Error al procesar el mensaje' });

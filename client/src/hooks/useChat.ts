@@ -6,6 +6,7 @@ import {
   getSessions,
   getSessionMessages,
   sendMessage,
+  updateSessionTitle as apiUpdateTitle,
 } from '../services/chatApi';
 
 export function useChat() {
@@ -50,6 +51,19 @@ export function useChat() {
     }
   }, []);
 
+  const renameSession = useCallback(async (sessionId: number, title: string) => {
+    try {
+      const updated = await apiUpdateTitle(sessionId, title);
+      setSessions((prev) => prev.map((s) => (s.id === sessionId ? updated : s)));
+      if (activeSession?.id === sessionId) {
+        setActiveSession(updated);
+      }
+      toast.success('Título actualizado');
+    } catch {
+      toast.error('Error al actualizar el título');
+    }
+  }, [activeSession]);
+
   const submitMessage = useCallback(
     async (content: string) => {
       if (!activeSession || isLoading) return;
@@ -66,7 +80,13 @@ export function useChat() {
       setError(null);
 
       try {
-        const reply = await sendMessage(activeSession.id, content);
+        const { reply, title } = await sendMessage(activeSession.id, content);
+        
+        if (title) {
+          setSessions((prev) => prev.map((s) => s.id === activeSession.id ? { ...s, title } : s));
+          setActiveSession((prev) => prev ? { ...prev, title } : null);
+        }
+
         const assistantMsg: Message = {
           id: Date.now() + 1,
           sessionId: activeSession.id,
@@ -95,5 +115,6 @@ export function useChat() {
     loadSession,
     startNewSession,
     submitMessage,
+    renameSession,
   };
 }

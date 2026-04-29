@@ -1,9 +1,11 @@
 import { createMessage, getSessionMessages } from '../dao/messageDao.js';
 import { upsertDreamSummary, getUserDreamSummaries } from '../dao/dreamSummaryDao.js';
-import { callMorfeo, extractDreamSummary } from './aiService.js';
+import { getSessionById, updateSessionTitle } from '../dao/sessionDao.js';
+import { callMorfeo, extractDreamSummary, generateSessionTitle } from './aiService.js';
 
 export async function processUserMessage(sessionId, userContent, userId) {
   const history = await getSessionMessages(sessionId);
+  const session = await getSessionById(sessionId, userId);
 
   const pastSummaries = await getUserDreamSummaries(userId);
   const pastContext = pastSummaries
@@ -30,8 +32,18 @@ export async function processUserMessage(sessionId, userContent, userId) {
 
   const assistantContent = await callMorfeo(conversationHistory);
 
-  await createMessage(sessionId, 'user', userContent);
-  await createMessage(sessionId, 'assistant', assistantContent);
+  // Generar y actualizar el título si es una sesión nueva (síncrono para devolverlo en la respuesta)
+  let newTitle = null;
+  if (session && session.title === 'Nueva sesión') {
+    try {
+      newTitle = await generateSessionTitle(userContent);
+      if (newTitle) {
+        await updateSessionTitle(sessionId, newTitle);
+      }
+    } catch (err) {
+      console.error('Error al actualizar título:', err);
+    }
+  }
 
   // Generar y actualizar el resumen de forma asíncrona para no bloquear la respuesta
   conversationHistory.push({ role: 'assistant', content: assistantContent });
@@ -48,5 +60,5 @@ export async function processUserMessage(sessionId, userContent, userId) {
     })
     .catch((err) => console.error('Error al guardar resumen del sueño:', err));
 
-  return assistantContent;
+  return { reply: assistantContent, title: newTitle };
 }

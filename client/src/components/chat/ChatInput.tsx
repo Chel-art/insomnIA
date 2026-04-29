@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, type KeyboardEvent } from 'react';
-import { useVoiceDictation } from '../../hooks/useVoiceDictation';
+import { useVoiceDictation } from '@/hooks/useVoiceDictation';
 
 interface ChatInputProps {
   onSubmit: (content: string) => void;
@@ -80,7 +80,7 @@ export function ChatInput({ onSubmit, isLoading }: ChatInputProps) {
         onFocus={(e) => (!isListening && (e.target.style.borderColor = 'var(--color-accent-purple)'))}
         onBlur={(e) => (!isListening && (e.target.style.borderColor = 'rgba(255,255,255,0.12)'))}
       />
-      
+
       {isSupported && (
         <button
           type="button"
