@@ -2,11 +2,22 @@ import { Router } from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { createSession, getUserSessions, getSessionById } from '../dao/sessionDao.js';
 import { getSessionMessages } from '../dao/messageDao.js';
+import { getUserDreamSummaries } from '../dao/dreamSummaryDao.js';
 import { processUserMessage } from '../services/chatService.js';
 
 const router = Router();
 
 router.use(requireAuth);
+
+router.get('/sessions/history', async (req, res) => {
+  try {
+    const history = await getUserDreamSummaries(req.userId);
+    res.json(history);
+  } catch (err) {
+    console.error('Error al obtener historial:', err);
+    res.status(500).json({ error: 'Error al obtener el historial de sueños' });
+  }
+});
 
 router.post('/sessions', async (req, res) => {
   try {
@@ -51,7 +62,7 @@ router.post('/chat', async (req, res) => {
   if (!session) return res.status(404).json({ error: 'Sesión no encontrada' });
 
   try {
-    const reply = await processUserMessage(parseInt(sessionId), content.trim());
+    const reply = await processUserMessage(parseInt(sessionId), content.trim(), req.userId);
     res.json({ reply });
   } catch (err) {
     console.error('Error en /api/chat:', err);

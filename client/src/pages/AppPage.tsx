@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { SessionList } from '@/components/sidebar/SessionList';
 import { ChatWindow } from '@/components/chat/ChatWindow';
 import { ChatInput } from '@/components/chat/ChatInput';
+import { DreamHistory } from '@/components/history/DreamHistory';
 import { useAuth } from '@/hooks/useAuth';
 import { useChat } from '@/hooks/useChat';
 
@@ -18,16 +20,29 @@ export function AppPage() {
     submitMessage,
   } = useChat();
 
+  const [view, setView] = useState<'chat' | 'history'>('chat');
+
+  const handleSelectSession = (session: any) => {
+    loadSession(session);
+    setView('chat');
+  };
+
+  const handleNewSession = () => {
+    startNewSession();
+    setView('chat');
+  };
+
   return (
     <AppLayout
       sidebar={
         <SessionList
           sessions={sessions}
           activeSession={activeSession}
-          onSelect={loadSession}
-          onNew={startNewSession}
+          onSelect={handleSelectSession}
+          onNew={handleNewSession}
           userEmail={user?.email}
           onLogout={logout}
+          onShowHistory={() => setView('history')}
         />
       }
     >
@@ -56,7 +71,9 @@ export function AppPage() {
           </div>
         )}
 
-        {!activeSession ? (
+        {view === 'history' ? (
+          <DreamHistory />
+        ) : !activeSession ? (
           <div
             style={{
               flex: 1,

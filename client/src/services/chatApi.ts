@@ -19,6 +19,11 @@ export async function getSessions(): Promise<Session[]> {
   return data;
 }
 
+export async function getDreamHistory(): Promise<any[]> {
+  const { data } = await api.get<any[]>('/sessions/history');
+  return data;
+}
+
 export async function getSessionMessages(sessionId: number): Promise<Message[]> {
   const { data } = await api.get<Message[]>(`/sessions/${sessionId}/messages`);
   return data;

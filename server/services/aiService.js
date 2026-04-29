@@ -52,3 +52,39 @@ export async function callMorfeo(conversationHistory) {
 
   return response.choices[0].message.content;
 }
+
+const SUMMARY_SYSTEM_PROMPT = `Eres un asistente experto en análisis psicológico.
+Tu tarea es leer una conversación entre un usuario (soñador) y Morfeo (intérprete) y extraer de los sueños del usuario los elementos clave.
+
+Debes responder ÚNICAMENTE con un objeto JSON válido con la siguiente estructura:
+{
+  "symbols": ["símbolo 1", "símbolo 2", ...],
+  "emotions": ["emoción 1", "emoción 2", ...],
+  "themes": ["tema 1", "tema 2", ...]
+}
+No incluyas markdown ni ningún otro texto. Solo el JSON bruto.`;
+
+export async function extractDreamSummary(conversationHistory) {
+  try {
+    const response = await client.chat.completions.create({
+      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      messages: [
+        { role: 'system', content: SUMMARY_SYSTEM_PROMPT },
+        { 
+          role: 'user', 
+          content: 'Extrae los símbolos, emociones y temas de esta conversación:\n\n' + 
+                   conversationHistory.map(m => `${m.role}: ${m.content}`).join('\n\n')
+        }
+      ],
+      temperature: 0.1,
+      response_format: { type: 'json_object' }
+    });
+
+    const content = response.choices[0].message.content;
+    return JSON.parse(content);
+  } catch (err) {
+    console.error('Error al extraer resumen:', err);
+    return { symbols: [], emotions: [], themes: [] };
+  }
+}
+

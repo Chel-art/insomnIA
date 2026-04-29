@@ -7,6 +7,7 @@ interface SessionListProps {
   onNew: () => void;
   userEmail: string | undefined;
   onLogout: () => void;
+  onShowHistory: () => void;
 }
 
 export function SessionList({
@@ -16,6 +17,7 @@ export function SessionList({
   onNew,
   userEmail,
   onLogout,
+  onShowHistory,
 }: SessionListProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.25rem', gap: '1rem' }}>
@@ -52,6 +54,14 @@ export function SessionList({
           +
         </button>
       </div>
+
+      <button 
+        type="button" 
+        onClick={onShowHistory}
+        className="w-full text-left py-2 px-3 rounded-[0.625rem] border border-white/10 text-[0.8125rem] text-gold-shimmer/90 hover:bg-white/5 transition-colors"
+      >
+        ✨ Memoria Onírica
+      </button>
 
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
         {sessions.length === 0 && (
