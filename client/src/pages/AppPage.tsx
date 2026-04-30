@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { AppLayout } from '@/components/layout/AppLayout';
-import { SessionList } from '@/components/sidebar/SessionList';
-import { ChatWindow } from '@/components/chat/ChatWindow';
-import { ChatInput } from '@/components/chat/ChatInput';
-import { DreamHistory } from '@/components/history/DreamHistory';
-import { useAuth } from '@/hooks/useAuth';
-import { useChat } from '@/hooks/useChat';
+import { AppLayout } from '../components/layout/AppLayout';
+import { SessionList } from '../components/sidebar/SessionList';
+import { ChatWindow } from '../components/chat/ChatWindow';
+import { ChatInput } from '../components/chat/ChatInput';
+import { DreamHistory } from '../components/history/DreamHistory';
+import { useAuth } from '../hooks/useAuth';
+import { useChat } from '../hooks/useChat';
 
 export function AppPage() {
   const { user, logout } = useAuth();

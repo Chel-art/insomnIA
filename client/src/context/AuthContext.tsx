@@ -1,6 +1,6 @@
 import { createContext, useCallback, useEffect, useState } from 'react';
-import type { AuthUser, LoginCredentials, RegisterCredentials } from '@/types/auth';
-import { loginUser, registerUser } from '@/services/authApi';
+import type { AuthUser, LoginCredentials, RegisterCredentials } from '../types/auth';
+import { loginUser, registerUser } from '../services/authApi';
 
 const TOKEN_KEY = 'insomnia_token';
 const USER_KEY = 'insomnia_user';

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { DottedSurface } from '@/components/ui/DottedSurface';
-import { useAuth } from '@/hooks/useAuth';
+import { DottedSurface } from '../components/ui/DottedSurface';
+import { useAuth } from '../hooks/useAuth';
 import type { AxiosError } from 'axios';
 
 export function LoginPage() {

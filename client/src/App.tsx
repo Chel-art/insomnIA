@@ -7,12 +7,12 @@
  */
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { AuthProvider } from '@/context/AuthContext';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { LoginPage } from '@/pages/LoginPage';
-import { RegisterPage } from '@/pages/RegisterPage';
-import { LandingPage } from '@/pages/LandingPage';
-import { AppPage } from '@/pages/AppPage';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { LandingPage } from './pages/LandingPage';
+import { AppPage } from './pages/AppPage';
 
 function App() {
   return (
