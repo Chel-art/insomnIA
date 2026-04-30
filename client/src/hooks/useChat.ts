@@ -7,6 +7,7 @@ import {
   getSessionMessages,
   sendMessage,
   updateSessionTitle as apiUpdateTitle,
+  deleteSession as apiDeleteSession,
 } from '../services/chatApi';
 
 export function useChat() {
@@ -64,6 +65,22 @@ export function useChat() {
     }
   }, [activeSession]);
 
+  const deleteSession = useCallback(async (sessionId: number) => {
+    if (!confirm('¿Estás seguro de que quieres eliminar esta conversación?')) return;
+    
+    try {
+      await apiDeleteSession(sessionId);
+      setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+      if (activeSession?.id === sessionId) {
+        setActiveSession(null);
+        setMessages([]);
+      }
+      toast.success('Conversación eliminada');
+    } catch {
+      toast.error('Error al eliminar la conversación');
+    }
+  }, [activeSession]);
+
   const submitMessage = useCallback(
     async (content: string) => {
       if (!activeSession || isLoading) return;
@@ -116,5 +133,6 @@ export function useChat() {
     startNewSession,
     submitMessage,
     renameSession,
+    deleteSession,
   };
 }

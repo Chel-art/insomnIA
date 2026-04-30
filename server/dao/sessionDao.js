@@ -27,3 +27,9 @@ export async function updateSessionTitle(sessionId, title) {
     data: { title },
   });
 }
+
+export async function deleteSession(sessionId) {
+  return prisma.session.delete({
+    where: { id: sessionId },
+  });
+}

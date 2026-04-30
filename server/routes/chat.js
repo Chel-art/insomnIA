@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../middleware/authMiddleware.js';
-import { createSession, getUserSessions, getSessionById, updateSessionTitle } from '../dao/sessionDao.js';
+import { createSession, getUserSessions, getSessionById, updateSessionTitle, deleteSession } from '../dao/sessionDao.js';
 import { getSessionMessages } from '../dao/messageDao.js';
 import { getUserDreamSummaries } from '../dao/dreamSummaryDao.js';
 import { processUserMessage } from '../services/chatService.js';
@@ -53,6 +53,21 @@ router.patch('/sessions/:id', async (req, res) => {
     res.json(updated);
   } catch {
     res.status(500).json({ error: 'Error al actualizar el título' });
+  }
+});
+
+router.delete('/sessions/:id', async (req, res) => {
+  const sessionId = parseInt(req.params.id);
+
+  const session = await getSessionById(sessionId, req.userId);
+  if (!session) return res.status(404).json({ error: 'Sesión no encontrada' });
+
+  try {
+    await deleteSession(sessionId);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error al eliminar sesión:', err);
+    res.status(500).json({ error: 'Error al eliminar la sesión' });
   }
 });
 

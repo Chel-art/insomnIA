@@ -9,6 +9,7 @@ interface SessionListProps {
   onLogout: () => void;
   onShowHistory: () => void;
   onRename: (sessionId: number, title: string) => void;
+  onDelete: (sessionId: number) => void;
 }
 
 export function SessionList({
@@ -20,6 +21,7 @@ export function SessionList({
   onLogout,
   onShowHistory,
   onRename,
+  onDelete,
 }: SessionListProps) {
   const handleRename = (e: React.MouseEvent, session: Session) => {
     e.stopPropagation();
@@ -27,6 +29,11 @@ export function SessionList({
     if (newTitle && newTitle.trim() && newTitle !== session.title) {
       onRename(session.id, newTitle.trim());
     }
+  };
+
+  const handleDelete = (e: React.MouseEvent, sessionId: number) => {
+    e.stopPropagation();
+    onDelete(sessionId);
   };
 
   return (
@@ -113,28 +120,53 @@ export function SessionList({
                 {session.title}
               </button>
               {isActive && (
-                <button
-                  type="button"
-                  onClick={(e) => handleRename(e, session)}
-                  title="Renombrar"
-                  style={{
-                    padding: '0.5rem',
-                    background: 'transparent',
-                    border: 'none',
-                    color: 'rgba(255,255,255,0.3)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: 'color 0.2s',
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-accent-purple)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-                  </svg>
-                </button>
+                <div style={{ display: 'flex', gap: '0.125rem' }}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleRename(e, session)}
+                    title="Renombrar"
+                    style={{
+                      padding: '0.4rem',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'rgba(255,255,255,0.3)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-accent-purple)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(e, session.id)}
+                    title="Eliminar sesión"
+                    style={{
+                      padding: '0.4rem',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'rgba(255,255,255,0.3)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'color 0.2s',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#f87171')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
               )}
             </div>
           );

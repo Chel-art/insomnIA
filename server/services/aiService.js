@@ -39,7 +39,7 @@ Tu misión es analizar los sueños que el usuario te describe, integrando enfoqu
 
 export async function callMorfeo(conversationHistory) {
   const response = await client.chat.completions.create({
-    model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
     messages: [
       { role: 'system', content: MORFEO_SYSTEM_PROMPT },
       ...conversationHistory,
@@ -65,7 +65,7 @@ No incluyas markdown ni ningún otro texto. Solo el JSON bruto.`;
 export async function extractDreamSummary(conversationHistory) {
   try {
     const response = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: SUMMARY_SYSTEM_PROMPT },
         { 
@@ -89,7 +89,7 @@ export async function extractDreamSummary(conversationHistory) {
 export async function generateSessionTitle(dreamContent) {
   try {
     const response = await client.chat.completions.create({
-      model: process.env.OPENAI_MODEL || 'gpt-4.1-mini',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
       messages: [
         { role: 'system', content: 'Eres un poeta conciso. Genera un título evocador y corto (máximo 4 palabras) para el siguiente sueño. No uses comillas en la respuesta.' },
         { role: 'user', content: dreamContent }

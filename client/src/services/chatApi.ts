@@ -38,3 +38,7 @@ export async function updateSessionTitle(sessionId: number, title: string): Prom
   const { data } = await api.patch<Session>(`/sessions/${sessionId}`, { title });
   return data;
 }
+
+export async function deleteSession(sessionId: number): Promise<void> {
+  await api.delete(`/sessions/${sessionId}`);
+}
